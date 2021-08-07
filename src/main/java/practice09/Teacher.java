@@ -1,56 +1,60 @@
 package practice09;
-
-import sun.awt.image.ImageWatched;
-
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class Teacher extends Person {
-    private Klass klass;
-    private LinkedList<Klass> linkedList = new LinkedList<Klass>();
-    public Teacher(int id, String name, int age, Klass klass){
-        super(id,name,age);
-        this.klass = klass;
-    }
-    public Teacher(int id, String name, int age, LinkedList linkedList){
+
+    private LinkedList<Klass> linkedList;
+
+    public Teacher(int id, String name, int age, LinkedList<Klass> linkedList){
         super(id,name,age);
         this.linkedList = linkedList;
     }
     public Teacher(int id, String name, int age) {
         super(id, name, age);
     }
-    public Klass getKlass() {
-        return klass;
-    }
+
 
     @Override
     public String introduce() {
-        return this.linkedList.size()!=0?String.format("%s I am a Teacher. I teach Class %s.",super.introduce(),linkedList):
-                String.format("%s I am a Teacher. I teach No Class.",super.introduce());
+        if(linkedList == null) {
+            return String.format("My name is %s. I am %d years old. I am a Teacher. I teach No Class.",getName(),getAge());
+        }
+        List <String> classes = new ArrayList<>();
+        for (Klass klassList:linkedList){
+            classes.add(String.valueOf(klassList.getNumber()));
+        }
+        String classList = String.join(", ",classes);
+        return String.format("My name is %s. I am %d years old. I am a Teacher. I teach Class %s.",getName(),getAge(),classList);
+
     }
     public String introduceWith(Student student) {
+        String message = super.introduce() + " I am a Teacher.";
+        List<Klass> klasses;
 
-            if(klass.getNumber() == student.getKlass().getNumber()) {
-                return String.format("%s I am a Teacher. I Teach %s.",super.introduce(),student.getName());
-            } else {
-                return String.format("%s I am a Teacher. I don'tTeach %s.",super.introduce(),student.getName());
-            }
+        klasses = linkedList
+                .stream()
+                .filter(klass -> klass.getNumber() == student
+                .getKlass().getNumber())
+                .collect(Collectors.toList());
+
+        if(!klasses.isEmpty()) {
+            return message + (" I teach " + student.getName() + ".");
         }
+        else {
+            return message + (" I don't teach " + student.getName() + ".");
+        }
+    }
     public boolean isTeaching(Student student){
-        return true;
+        return linkedList.contains(student.getKlass());
     }
 
     public LinkedList<Klass> getClasses() {
-        return linkedList;
+        return this.linkedList ;
     }
-
-
-//    Teacher also has an `isTeaching` method, which accepts an instance of `Student`
-//    and return `true/false`.
-//    As long as the student is in any `klass` of the `classes`, the teacher is teaching him.
-//    Whether the student is in klass, `Klass` has a method `isIn` to judge.
 
 
 
